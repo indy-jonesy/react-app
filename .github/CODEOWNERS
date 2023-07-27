@@ -1,0 +1,4 @@
+* @indy-jonesy
+*.js @indy-jonesy
+*.yml @indy-jonesy2
+/public/ @indy-jonesy
