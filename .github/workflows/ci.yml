@@ -26,5 +26,13 @@ jobs:
         env:
           CI: true
       - name: Build Project
+        # this will ONLY run against push against `develop` branch
         if: github.event_name == 'push'
         run: npm run build
+      - name: Deploy to Staging
+        if: github.event_name == 'push'
+        run: npx surge --project ./build --domain elastic-appliance.surge.sh
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+
