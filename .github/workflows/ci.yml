@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Action
+        uses: actions/checkout@v3
+      - name: Use NodeJS
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Install NPM
+        run: npm ci
+      - run: npm run format:check
+      - run: npm test -- --coverage
+        env:
+          CI: true
+      - name: Build Project
+        # this will ONLY run against push against `develop` branch
+        if: github.event_name == 'push'
+        run: npm run build
+      - name: Deploy to Staging
+        if: github.event_name == 'push'
+        run: npx surge --project ./build --domain elastic-appliance.surge.sh
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
