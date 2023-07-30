@@ -5,10 +5,11 @@ on:
     types: [opened, synchronize, reopened]
     branches:
       - develop
+      - main
   push:
     branches:
       - develop
-
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,10 +33,26 @@ jobs:
       - run: npm test -- --coverage
         env:
           CI: true
+      - name: Upload Test Coverage
+        uses: actions/upload-artifact@v1
+        with:
+          path: coverage
+          name: code-coverage
       - name: Build Project
         # this will ONLY run against push against `develop` branch
         if: github.event_name == 'push'
         run: npm run build
+      - name: Upload Build Folder
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v1
+        with:
+          path: build
+          name: build
+      - name: Create a release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to Staging
         if: github.event_name == 'push'
         run: npx surge --project ./build --domain elastic-appliance.surge.sh
