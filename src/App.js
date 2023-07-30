@@ -15,11 +15,13 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn Something New!
+          Learn React
         </a>
       </header>
     </div>
   );
 }
+// npm run build
+// surge
 
 export default App;
